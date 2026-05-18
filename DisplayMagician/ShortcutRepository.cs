@@ -807,6 +807,49 @@ namespace DisplayMagician
 
         }
 
+        private static bool TrySetPlaybackVolumeWithRetry(string targetAudioDeviceFullName, double targetVolume, bool communicationsDevice, int maxAttempts = 20, int delayBetweenAttemptsMs = 500)
+        {
+            if (_audioController == null || string.IsNullOrWhiteSpace(targetAudioDeviceFullName))
+                return false;
+
+            for (int attempt = 1; attempt <= maxAttempts; attempt++)
+            {
+                try
+                {
+                    CoreAudioDevice targetDevice = _audioController
+                        .GetPlaybackDevices(DeviceState.Active)
+                        .FirstOrDefault(device => device.FullName.Equals(targetAudioDeviceFullName, StringComparison.OrdinalIgnoreCase));
+
+                    if (targetDevice == null)
+                    {
+                        CoreAudioDevice currentDefaultDevice = communicationsDevice
+                            ? _audioController.DefaultPlaybackCommunicationsDevice
+                            : _audioController.DefaultPlaybackDevice;
+
+                        if (currentDefaultDevice != null && currentDefaultDevice.FullName.Equals(targetAudioDeviceFullName, StringComparison.OrdinalIgnoreCase))
+                            targetDevice = currentDefaultDevice;
+                    }
+
+                    if (targetDevice != null)
+                    {
+                        Task setVolumeTask = Task.Run(() => targetDevice.SetVolumeAsync(targetVolume));
+                        setVolumeTask.Wait(2000);
+                        logger.Info($"ShortcutRepository/TrySetPlaybackVolumeWithRetry: Set {(communicationsDevice ? "communications " : string.Empty)}playback volume on '{targetAudioDeviceFullName}' to {targetVolume}% on attempt {attempt}/{maxAttempts}.");
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.Debug(ex, $"ShortcutRepository/TrySetPlaybackVolumeWithRetry: Attempt {attempt}/{maxAttempts} failed while setting {(communicationsDevice ? "communications " : string.Empty)}playback volume on '{targetAudioDeviceFullName}'.");
+                }
+
+                Thread.Sleep(delayBetweenAttemptsMs);
+            }
+
+            logger.Warn($"ShortcutRepository/TrySetPlaybackVolumeWithRetry: Unable to set {(communicationsDevice ? "communications " : string.Empty)}playback volume on '{targetAudioDeviceFullName}' after {maxAttempts} attempts.");
+            return false;
+        }
+
 
         public static RunShortcutResult RunShortcut(ShortcutItem shortcutToUse, ref CancellationToken cancelToken)
         {
@@ -985,22 +1028,12 @@ namespace DisplayMagician
                                 if (shortcutToUse.SetAudioVolume)
                                 {
                                     logger.Info($"ShortcutRepository/RunShortcut: Setting {shortcutToUse.AudioDevice} volume level to {shortcutToUse.AudioVolume}%.");
-                                    Task myTask = new Task(() =>
-                                    {
-                                        _audioController.DefaultPlaybackDevice.SetVolumeAsync(Convert.ToDouble(shortcutToUse.AudioVolume));
-                                    });
-                                    myTask.Start();
-                                    myTask.Wait(2000);
+                                    TrySetPlaybackVolumeWithRetry(shortcutToUse.AudioDevice, Convert.ToDouble(shortcutToUse.AudioVolume), false);
 
                                     if (shortcutToUse.UseAsCommsAudioDevice)
                                     {
                                         logger.Info($"ShortcutRepository/RunShortcut: Setting {shortcutToUse.AudioDevice} Communications Audio volume level to be {shortcutToUse.AudioVolume}%.");
-                                        myTask = new Task(() =>
-                                        {
-                                            _audioController.DefaultPlaybackCommunicationsDevice.SetVolumeAsync(Convert.ToDouble(shortcutToUse.AudioVolume));
-                                        });
-                                        myTask.Start();
-                                        myTask.Wait(2000);
+                                        TrySetPlaybackVolumeWithRetry(shortcutToUse.AudioDevice, Convert.ToDouble(shortcutToUse.AudioVolume), true);
                                     }
                                     else
                                     {
