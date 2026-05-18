@@ -1698,13 +1698,13 @@ namespace DisplayMagician
                         if (!audioFound)
                         {
                             logger.Warn($"ShortcutItem/RefreshValidity: The audio device {AudioDevice} was not found in the list of audio devices currently available!");
-                            ShortcutError error = new ShortcutError();
-                            error.Name = "AudioDeviceNotFound";
-                            error.Validity = ShortcutValidity.Warning;
-                            error.Message = $"The audio device {AudioDevice} was not found in the list of audio devices currently available!";
-                            _shortcutErrors.Add(error);
-                            if (worstError != ShortcutValidity.Error)
-                                worstError = ShortcutValidity.Warning;
+                            // ShortcutError error = new ShortcutError();
+                            // error.Name = "AudioDeviceNotFound";
+                            // error.Validity = ShortcutValidity.Warning;
+                            // error.Message = $"The audio device {AudioDevice} was not found in the list of audio devices currently available!";
+                            // _shortcutErrors.Add(error);
+                            // if (worstError != ShortcutValidity.Error)
+                            //     worstError = ShortcutValidity.Warning;
                         }
                     }                    
                     else
