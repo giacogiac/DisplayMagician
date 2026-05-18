@@ -366,7 +366,7 @@ namespace DisplayMagician.GameLibraries
             Match match = Regex.Match(steamGameNameOrUuid, steamAppIdRegex, RegexOptions.IgnoreCase);
             if (match.Success)
             {
-                foreach (SteamGame testSteamGame in _allSteamGames)
+                foreach (Game testSteamGame in _allSteamGames)
                 {
                     if (steamGameNameOrUuid.Equals(Convert.ToInt32(testSteamGame.Id)))
                         return true;
@@ -375,7 +375,7 @@ namespace DisplayMagician.GameLibraries
             }
             else
             {
-                foreach (SteamGame testSteamGame in _allSteamGames)
+                foreach (Game testSteamGame in _allSteamGames)
                 {
                     if (steamGameNameOrUuid.Equals(testSteamGame.Name))
                         return true;
@@ -389,7 +389,7 @@ namespace DisplayMagician.GameLibraries
 
         public override bool ContainsGameById(string steamGameId)
         {
-            foreach (SteamGame testSteamGame in _allSteamGames)
+            foreach (Game testSteamGame in _allSteamGames)
             {
                 if (steamGameId == testSteamGame.Id)
                     return true;
@@ -712,9 +712,12 @@ namespace DisplayMagician.GameLibraries
                         }
                     }
                 }
-                
 
-                
+                // We add BigPicture first
+                SteamBigPicture bigPicture = new SteamBigPicture(_steamExe);
+                _allSteamGames.Add(bigPicture);
+                logger.Debug($"SteamLibrary/LoadInstalledGames: Adding Steam Bigpicture with game id {bigPicture.Id}, name {bigPicture.Name}, game exe {bigPicture.ExePath} and icon path {bigPicture.IconPath}");
+
                 // Now we go off and find the details for the games in each Steam Library
                 foreach (string steamLibraryPath in steamLibrariesPaths)
                 {
