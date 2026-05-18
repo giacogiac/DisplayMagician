@@ -48,7 +48,7 @@ namespace DisplayMagician.GameLibraries
 
         #region Methods
 
-        public virtual bool CopyTo(Game steamGame)
+        public virtual bool CopyTo(Game game)
         {
             return true;
         }
