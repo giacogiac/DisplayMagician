@@ -1347,7 +1347,8 @@ namespace DisplayMagician.UIForms
                 cb_autosuggest.Checked = _shortcutToEdit.AutoName;
 
                 // Set the Hotkey text
-                UpdateHotkeyLabel(_shortcutToEdit.Hotkey);
+                _hotkey = _shortcutToEdit.Hotkey;
+                UpdateHotkeyLabel(_hotkey);
 
                 // *** 1. Choose Display Profile Tab ***
                 // Find the profile
