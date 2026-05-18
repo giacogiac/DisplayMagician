@@ -3665,6 +3665,9 @@ namespace DisplayMagicianShared.NVIDIA
             catch (ArgumentNullException) { return; }
             catch (NullReferenceException) { return; }
 
+            if (InitializeInternal == null)
+                return;
+
             if (InitializeInternal() == NVAPI_STATUS.NVAPI_OK)
             {
                 GetDelegate(NvId_Unload, out UnloadInternal);
