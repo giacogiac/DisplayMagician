@@ -40,6 +40,8 @@ namespace DisplayMagician.UIForms
             cb_start_on_boot = new System.Windows.Forms.CheckBox();
             label1 = new System.Windows.Forms.Label();
             cmb_loglevel = new System.Windows.Forms.ComboBox();
+            lbl_apply_profile_on_start = new System.Windows.Forms.Label();
+            cmb_apply_profile_on_start = new System.Windows.Forms.ComboBox();
             cb_minimise_notification_area = new System.Windows.Forms.CheckBox();
             gb_hotkeys = new System.Windows.Forms.GroupBox();
             lbl_hotkey_shortcut_library = new System.Windows.Forms.Label();
@@ -95,6 +97,8 @@ namespace DisplayMagician.UIForms
             gb_general.Controls.Add(cb_start_on_boot);
             gb_general.Controls.Add(label1);
             gb_general.Controls.Add(cmb_loglevel);
+            gb_general.Controls.Add(lbl_apply_profile_on_start);
+            gb_general.Controls.Add(cmb_apply_profile_on_start);
             gb_general.Controls.Add(cb_minimise_notification_area);
             gb_general.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             gb_general.ForeColor = System.Drawing.Color.White;
@@ -216,6 +220,29 @@ namespace DisplayMagician.UIForms
             cmb_loglevel.Name = "cmb_loglevel";
             cmb_loglevel.Size = new System.Drawing.Size(388, 24);
             cmb_loglevel.TabIndex = 12;
+            // 
+            // lbl_apply_profile_on_start
+            // 
+            lbl_apply_profile_on_start.AutoSize = true;
+            lbl_apply_profile_on_start.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            lbl_apply_profile_on_start.ForeColor = System.Drawing.Color.Transparent;
+            lbl_apply_profile_on_start.Location = new System.Drawing.Point(30, 290);
+            lbl_apply_profile_on_start.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lbl_apply_profile_on_start.Name = "lbl_apply_profile_on_start";
+            lbl_apply_profile_on_start.Size = new System.Drawing.Size(229, 16);
+            lbl_apply_profile_on_start.TabIndex = 49;
+            lbl_apply_profile_on_start.Text = "Apply this Display Profile on launch:";
+            // 
+            // cmb_apply_profile_on_start
+            // 
+            cmb_apply_profile_on_start.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            cmb_apply_profile_on_start.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            cmb_apply_profile_on_start.FormattingEnabled = true;
+            cmb_apply_profile_on_start.Location = new System.Drawing.Point(33, 308);
+            cmb_apply_profile_on_start.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            cmb_apply_profile_on_start.Name = "cmb_apply_profile_on_start";
+            cmb_apply_profile_on_start.Size = new System.Drawing.Size(552, 24);
+            cmb_apply_profile_on_start.TabIndex = 50;
             // 
             // cb_minimise_notification_area
             // 
@@ -555,6 +582,8 @@ namespace DisplayMagician.UIForms
         private System.Windows.Forms.CheckBox cb_start_on_boot;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox cmb_loglevel;
+        private System.Windows.Forms.Label lbl_apply_profile_on_start;
+        private System.Windows.Forms.ComboBox cmb_apply_profile_on_start;
         private System.Windows.Forms.CheckBox cb_minimise_notification_area;
         private System.Windows.Forms.GroupBox gb_hotkeys;
         private System.Windows.Forms.Button btn_hotkey_shortcuts;

@@ -52,6 +52,7 @@ namespace DisplayMagician
         private bool _startOnBootUp = false;
         private bool _minimiseOnStart = false;
         private bool _showSplashScreen = true;
+        private string _applyProfileOnStartUUID = "";
         private bool _showMinimiseMessageInActionCenter = true;
         private bool _showStatusMessageInActionCenter = true;
         private bool _upgradeToPrereleases = false;
@@ -274,6 +275,19 @@ namespace DisplayMagician
             set
             {
                 _showStatusMessageInActionCenter = value;               
+            }
+        }
+
+        [DefaultValue("")]
+        public string ApplyProfileOnStartUUID
+        {
+            get
+            {
+                return _applyProfileOnStartUUID;
+            }
+            set
+            {
+                _applyProfileOnStartUUID = value;
             }
         }
 

@@ -700,6 +700,7 @@ namespace DisplayMagician {
 
                 // Set up the AppMainForm variable that we need to use later
                 AppMainForm = new MainForm();
+                AppMainForm.HandleCreated += MainForm_HandleCreated_ApplyProfileOnStartup;
                 AppMainForm.Load += MainForm_LoadCompletedAndOpenApp;
 
                 ERRORLEVEL errLevel = StartUpApplication();
@@ -872,6 +873,55 @@ namespace DisplayMagician {
             AppMainForm.TopMost = true;
             AppMainForm.Activate();
             AppMainForm.TopMost = false;
+        }
+
+        private static void MainForm_HandleCreated_ApplyProfileOnStartup(object sender, EventArgs e)
+        {
+            AppMainForm.HandleCreated -= MainForm_HandleCreated_ApplyProfileOnStartup;
+
+            AppMainForm.BeginInvoke(new Action(() => ApplyProfileOnStartup()));
+        }
+
+        private static void ApplyProfileOnStartup()
+        {
+            string profileUUID = AppProgramSettings.ApplyProfileOnStartUUID;
+
+            // Nothing to do if the user hasn't selected a profile to apply on launch
+            if (String.IsNullOrWhiteSpace(profileUUID))
+            {
+                logger.Trace($"Program/ApplyProfileOnStartup: No 'apply profile on launch' profile is configured.");
+                return;
+            }
+
+            try
+            {
+                // Accessing AllProfiles ensures the profiles have been loaded from storage
+                ProfileItem profileToApply = ProfileRepository.AllProfiles.FirstOrDefault(p => p.UUID.Equals(profileUUID));
+                if (profileToApply == null)
+                {
+                    logger.Warn($"Program/ApplyProfileOnStartup: Cannot find 'apply profile on launch' profile with UUID {profileUUID}.");
+                    return;
+                }
+
+                // Work out what the current display layout is so we don't needlessly re-apply it
+                ProfileRepository.UpdateActiveProfile();
+                if (ProfileRepository.IsActiveProfile(profileToApply))
+                {
+                    logger.Info($"Program/ApplyProfileOnStartup: The 'apply profile on launch' profile '{profileToApply.Name}' is already the active display profile.");
+                    return;
+                }
+
+                logger.Info($"Program/ApplyProfileOnStartup: Applying the 'apply profile on launch' display profile '{profileToApply.Name}'.");
+                ApplyProfileResult result = Program.ApplyProfileTask(profileToApply);
+                if (result != ApplyProfileResult.Successful)
+                {
+                    logger.Warn($"Program/ApplyProfileOnStartup: Unable to apply the 'apply profile on launch' display profile '{profileToApply.Name}' (result: {result}).");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, $"Program/ApplyProfileOnStartup: Exception while trying to apply the 'apply profile on launch' display profile with UUID {profileUUID}.");
+            }
         }
 
         // ReSharper disable once CyclomaticComplexity

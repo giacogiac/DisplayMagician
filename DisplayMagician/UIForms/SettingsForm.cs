@@ -21,6 +21,13 @@ namespace DisplayMagician.UIForms
 
         private Dictionary<string, string> logLevelText = new Dictionary<string, string>();
 
+        private class ProfileComboItem
+        {
+            public string Name { get; set; }
+            public string UUID { get; set; }
+            public override string ToString() => Name;
+        }
+
         public SettingsForm()
         {
             logger.Info($"SettingsForm/SettingsForm: Creating a SettingsForm UI Form");
@@ -38,6 +45,14 @@ namespace DisplayMagician.UIForms
             // Now use it to populate the LogLevel Dropdown
             cmb_loglevel.Items.Clear();
             cmb_loglevel.Items.AddRange(logLevelText.Values.ToArray());
+
+            // Populate the "apply display profile on launch" dropdown
+            cmb_apply_profile_on_start.Items.Clear();
+            cmb_apply_profile_on_start.Items.Add(new ProfileComboItem { Name = "(None - do not change display profile on launch)", UUID = "" });
+            foreach (ProfileItem myProfile in ProfileRepository.AllProfiles)
+            {
+                cmb_apply_profile_on_start.Items.Add(new ProfileComboItem { Name = myProfile.Name, UUID = myProfile.UUID });
+            }
         }
 
         private void SettingsForm_Load(object sender, EventArgs e)
@@ -157,6 +172,20 @@ namespace DisplayMagician.UIForms
                     logger.Info($"SettingsForm/SettingsForm_Load: AppProgramSettings LogLevel set to Trace");
                     break;
             }
+
+            // Select the currently saved profile (or "None" if not set or no longer exists)
+            int applyProfileSelectedIndex = 0;
+            string savedApplyProfileUUID = Program.AppProgramSettings.ApplyProfileOnStartUUID;
+            for (int i = 1; i < cmb_apply_profile_on_start.Items.Count; i++)
+            {
+                if (((ProfileComboItem)cmb_apply_profile_on_start.Items[i]).UUID.Equals(savedApplyProfileUUID))
+                {
+                    applyProfileSelectedIndex = i;
+                    break;
+                }
+            }
+            cmb_apply_profile_on_start.SelectedIndex = applyProfileSelectedIndex;
+            logger.Info($"SettingsForm/SettingsForm_Load: AppProgramSettings ApplyProfileOnStartUUID set to '{savedApplyProfileUUID}'");
 
             // Set the Hotkey values in the form
             UpdateHotkeyLabel(Program.AppProgramSettings.HotkeyMainWindow, lbl_hotkey_main_window);
@@ -366,6 +395,13 @@ namespace DisplayMagician.UIForms
                 AutoUpdater.PersistenceProvider.SetRemindLater(DateTime.Now);
                 logger.Info($"SettingsForm/SettingsForm_FormClosing: Successfully stopped DisplayMagician from looking for upgrades when starting");
             }
+
+            // save the display profile to apply on launch
+            if (cmb_apply_profile_on_start.SelectedItem is ProfileComboItem selectedApplyProfile)
+                Program.AppProgramSettings.ApplyProfileOnStartUUID = selectedApplyProfile.UUID;
+            else
+                Program.AppProgramSettings.ApplyProfileOnStartUUID = "";
+            logger.Info($"SettingsForm/SettingsForm_FormClosing: Successfully saved ApplyProfileOnStartUUID as '{Program.AppProgramSettings.ApplyProfileOnStartUUID}'");
 
             // Save ProgramSettings
             Program.AppProgramSettings.SaveSettings();
